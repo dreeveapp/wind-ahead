@@ -1,9 +1,14 @@
-import { METRIC } from './utils/units';
-import { SPEED_KEY, UNITS_KEY, THEME_KEY, WEATHER_MODEL_KEY, WEATHER_MODELS } from './constants';
+import { METRIC, WIND_SPEED_AUTO, WIND_SPEED_MS } from './utils/units';
+import { SPEED_KEY, UNITS_KEY, WIND_SPEED_UNIT_KEY, THEME_KEY, WEATHER_MODEL_KEY, WEATHER_MODELS } from './constants';
 
 function initialWeatherModel() {
     const saved = localStorage.getItem(WEATHER_MODEL_KEY);
     return WEATHER_MODELS.some((m) => m.id === saved) ? localStorage.getItem(WEATHER_MODEL_KEY) : WEATHER_MODELS[0].id;
+}
+
+function initialWindSpeedUnit() {
+    const saved = localStorage.getItem(WIND_SPEED_UNIT_KEY);
+    return saved === WIND_SPEED_MS ? WIND_SPEED_MS : WIND_SPEED_AUTO;
 }
 
 export const $ = (name) => document.querySelector(`[data-component="${name}"]`);
@@ -25,6 +30,7 @@ export const state = {
     windSpeed: 0,
     reversed: false,
     unitSystem: localStorage.getItem(UNITS_KEY) || METRIC,
+    windSpeedUnit: initialWindSpeedUnit(),
     weatherModel: initialWeatherModel(),
     isDarkMode: (localStorage.getItem(THEME_KEY) || 'dark') === 'dark',
     _weatherCache: null,

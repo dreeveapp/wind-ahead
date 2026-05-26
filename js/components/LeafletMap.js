@@ -1,6 +1,6 @@
 import { GeoUtils } from '../utils/GeoUtils';
 import { TILE_DARK, TILE_LIGHT, WEATHER_CODES, WEATHER_ICONS } from '../constants';
-import { unitLabel } from '../utils/units';
+import { unitLabel, windSpeedLabel } from '../utils/units';
 import { state as appState } from '../state';
 
 export class LeafletMap {
@@ -174,8 +174,8 @@ export class LeafletMap {
     }
 
     render(state) {
-        const { points, analysis, windDir: wDir, windSpeed: wSpeed, unitSystem } = state;
-        const speed = unitLabel(unitSystem, 'speed');
+        const { points, analysis, windDir: wDir, windSpeed: wSpeed } = state;
+        const speed = windSpeedLabel(state);
         if (this.map) { this.map.remove(); this.map = null; }
         this.map = L.map('map');
         this.tileLayer = L.tileLayer(appState.isDarkMode ? TILE_DARK : TILE_LIGHT, {

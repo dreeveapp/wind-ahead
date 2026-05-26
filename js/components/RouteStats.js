@@ -1,5 +1,5 @@
 import { $ } from '../state';
-import { unitLabel, convertUnit, IMPERIAL } from '../utils/units';
+import { unitLabel, convertUnit, windSpeedLabel, windSpeedToKmh } from '../utils/units';
 import { UV_BANDS, NO_WIND_THRESHOLD } from '../constants';
 import { GeoUtils } from '../utils/GeoUtils';
 import { Popover } from './Popover';
@@ -48,6 +48,8 @@ export class RouteStats {
             this.elevUnit.textContent = unitLabel(unitSystem, 'elev');
         }
 
+        const windUnit = windSpeedLabel(state);
+
         const ah = analysis.avgHead;
         this.statNetValue.className = STAT_VALUE_CLASS;
         if (ah > NO_WIND_THRESHOLD) {
@@ -64,7 +66,7 @@ export class RouteStats {
             this.statNetLabel.textContent = 'Net Crosswind';
         }
         this.statNet.textContent = Math.abs(analysis.avgHead).toFixed(1);
-        this.netWindUnit.textContent = unitLabel(unitSystem, 'speed');
+        this.netWindUnit.textContent = windUnit;
 
         const hasWeather = !!weather;
         this.tempContainer.classList.toggle('hidden', !hasWeather);
@@ -73,8 +75,8 @@ export class RouteStats {
             this.statTemp.textContent = weather.temperature2m;
             this.tempUnit.textContent = unitLabel(unitSystem, 'temp');
             this.statWindSpeed.textContent = weather.windSpeed10m;
-            this.windSpeedUnit.textContent = unitLabel(unitSystem, 'speed');
-            this.renderBeaufort(weather.windSpeed10m, unitSystem);
+            this.windSpeedUnit.textContent = windUnit;
+            this.renderBeaufort(weather.windSpeed10m, state);
         }
 
         const hasUv = hasWeather && weather.uvIndexMax != null;
@@ -84,8 +86,8 @@ export class RouteStats {
         }
     }
 
-    renderBeaufort(windSpeed, unitSystem) {
-        const kmh = unitSystem === IMPERIAL ? windSpeed * 1.609344 : windSpeed;
+    renderBeaufort(windSpeed, state) {
+        const kmh = windSpeedToKmh(windSpeed, state);
         const b = GeoUtils.beaufort(kmh);
         const [r, g, bl] = b.color;
         this.beaufortChip.textContent = `Force ${b.force} - ${b.name}`;

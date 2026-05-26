@@ -1,6 +1,6 @@
 import { WindType, windTypeShortLabel } from '../constants';
 import { GeoUtils } from '../utils/GeoUtils';
-import { unitLabel, convertUnit } from '../utils/units';
+import { unitLabel, convertUnit, windSpeedLabel } from '../utils/units';
 import { $, state } from '../state';
 
 export class WindStrip {
@@ -38,7 +38,7 @@ export class WindStrip {
             const { unitSystem } = state;
             const dist = convertUnit(seg.cumDist / 1000, 'dist', unitSystem).toFixed(1);
             const distU = unitLabel(unitSystem, 'dist');
-            const speedU = unitLabel(unitSystem, 'speed');
+            const speedU = windSpeedLabel(state);
             const typeClass = seg.type === WindType.HEADWIND ? 'text-red-600' : seg.type === WindType.TAILWIND ? 'text-green-600'
                 : seg.type === WindType.CALM ? 'text-gray-500' : 'text-amber-600';
             const typeLabel = windTypeShortLabel(seg.type);

@@ -2,7 +2,7 @@ import { $ } from '../state';
 import { LocalDate } from '../utils/LocalDate';
 import { GeoUtils } from '../utils/GeoUtils';
 import { UV_BANDS } from '../constants';
-import { unitLabel, convertUnit } from '../utils/units';
+import { unitLabel, convertUnit, windSpeedLabel } from '../utils/units';
 
 function uvDisplay(uv) {
     if (uv == null || Number.isNaN(Number(uv))) {
@@ -54,7 +54,7 @@ export class HourlyForecastTable {
         }
         this.section.classList.remove('hidden');
         const { unitSystem } = state;
-        const speedU = unitLabel(unitSystem, 'speed');
+        const speedU = windSpeedLabel(state);
         const precipU = unitLabel(unitSystem, 'precip');
         this.body.innerHTML = rows.map((row) => {
             const timeStr = new LocalDate(row.time).toLocaleDateString(undefined, {

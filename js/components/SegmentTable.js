@@ -1,7 +1,7 @@
 import { $ } from '../state';
 import { GeoUtils } from '../utils/GeoUtils';
 import { NO_WIND_THRESHOLD, WindType, windTypeShortLabel } from '../constants';
-import { unitLabel, convertUnit } from '../utils/units';
+import { unitLabel, convertUnit, windSpeedLabel } from '../utils/units';
 import { NetWindBar } from './NetWindBar';
 
 export class SegmentTable {
@@ -14,7 +14,7 @@ export class SegmentTable {
     render(state) {
         const { unitSystem } = state;
         const rows = this.compute(state.analysis.segments, NO_WIND_THRESHOLD);
-        const speed = unitLabel(unitSystem, 'speed');
+        const speed = windSpeedLabel(state);
         const elev = unitLabel(unitSystem, 'elev');
         if (!rows.length) {
             this.container.classList.add('hidden');
