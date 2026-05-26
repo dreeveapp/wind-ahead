@@ -60,6 +60,7 @@ export const WEATHER_PARAMS = [
 
 export const SPEED_KEY = 'wind-analyzer-speed';
 export const UNITS_KEY = 'wind-analyzer-units';
+export const WIND_SPEED_UNIT_KEY = 'wind-analyzer-wind-speed-unit';
 export const THEME_KEY = 'wind-analyzer-theme';
 export const WEATHER_MODEL_KEY = 'wind-analyzer-weather-model';
 

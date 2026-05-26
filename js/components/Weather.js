@@ -2,7 +2,7 @@ import { $ } from '../state';
 import { WEATHER_CODES, WEATHER_ICONS } from '../constants';
 import { GeoUtils } from '../utils/GeoUtils';
 import { LocalDate } from '../utils/LocalDate';
-import { unitLabel, convertUnit, IMPERIAL } from '../utils/units';
+import { unitLabel, convertUnit, windSpeedLabel, IMPERIAL } from '../utils/units';
 
 export class Weather {
     constructor() {
@@ -22,7 +22,7 @@ export class Weather {
 
     render(state) {
         const { weather, windDir, dateTime, unitSystem } = state;
-        const speed = unitLabel(unitSystem, 'speed');
+        const speed = windSpeedLabel(state);
         const date = new LocalDate(dateTime);
         const opts = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         this.title.textContent = `Weather - ${date.toLocaleDateString(undefined, opts)}`;

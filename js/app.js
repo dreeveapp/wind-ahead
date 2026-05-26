@@ -1,8 +1,8 @@
 import { $, state, setView, setLoading, setError } from './state';
 import { assertUniqueDataComponents } from './utils/assertUniqueDataComponents';
 import { LocalDate } from './utils/LocalDate';
-import { unitLabel, METRIC, IMPERIAL } from './utils/units';
-import { SPEED_KEY, UNITS_KEY, THEME_KEY, WEATHER_MODEL_KEY, WEATHER_MODELS } from './constants';
+import { unitLabel, windSpeedApiUnit, METRIC, IMPERIAL, WIND_SPEED_AUTO, WIND_SPEED_MS } from './utils/units';
+import { SPEED_KEY, UNITS_KEY, WIND_SPEED_UNIT_KEY, THEME_KEY, WEATHER_MODEL_KEY, WEATHER_MODELS } from './constants';
 import { GpxParser } from './services/GpxParser';
 import { OpenMeteo } from './services/OpenMeteo';
 import { RouteAnalyzer } from './services/RouteAnalyzer';
@@ -118,13 +118,13 @@ async function runAnalysis() {
         const lat = state.centroid.lat.toFixed(4);
         const lon = state.centroid.lon.toFixed(4);
         const localDate = new LocalDate(state.dateTime);
-        const cacheKey = `${lat},${lon},${localDate.dateStr},${state.unitSystem},${state.weatherModel}`;
+        const cacheKey = `${lat},${lon},${localDate.dateStr},${state.unitSystem},${state.windSpeedUnit},${state.weatherModel}`;
 
         let data;
         if (state._weatherCache && state._weatherCache.key === cacheKey) {
             data = state._weatherCache.data;
         } else {
-            data = await openMeteo.fetch(lat, lon, localDate, state.unitSystem, state.weatherModel);
+            data = await openMeteo.fetch(lat, lon, localDate, state.unitSystem, state.weatherModel, windSpeedApiUnit(state));
             state._weatherCache = { key: cacheKey, data };
         }
         const weather = openMeteo.extract(data, localDate);
@@ -206,11 +206,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         tour.run();
     });
     const unitToggle = $('unitToggle');
+    const windSpeedMsItem = $('windSpeedMsItem');
+    const windSpeedMsToggle = $('windSpeedMsToggle');
+
+    function updateWindSpeedMsVisibility() {
+        windSpeedMsItem.classList.toggle('hidden', state.unitSystem === IMPERIAL);
+    }
+
     unitToggle.checked = state.unitSystem === IMPERIAL;
     unitToggle.addEventListener('change', () => {
         state.unitSystem = unitToggle.checked ? IMPERIAL : METRIC;
         localStorage.setItem(UNITS_KEY, state.unitSystem);
+        if (state.unitSystem === IMPERIAL && state.windSpeedUnit === WIND_SPEED_MS) {
+            state.windSpeedUnit = WIND_SPEED_AUTO;
+            localStorage.setItem(WIND_SPEED_UNIT_KEY, state.windSpeedUnit);
+            windSpeedMsToggle.checked = false;
+        }
+        updateWindSpeedMsVisibility();
         updateUnitLabels();
+        if (state.analysis) {
+            runAnalysis();
+        }
+    });
+    windSpeedMsToggle.checked = state.windSpeedUnit === WIND_SPEED_MS;
+    updateWindSpeedMsVisibility();
+    windSpeedMsToggle.addEventListener('change', () => {
+        state.windSpeedUnit = windSpeedMsToggle.checked ? WIND_SPEED_MS : WIND_SPEED_AUTO;
+        localStorage.setItem(WIND_SPEED_UNIT_KEY, state.windSpeedUnit);
         if (state.analysis) {
             runAnalysis();
         }
