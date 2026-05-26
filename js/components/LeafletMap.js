@@ -102,6 +102,45 @@ export class LeafletMap {
         this.map.addControl(new Recenter());
     }
 
+    addFullscreenControl() {
+        const self = this;
+        const enterIcon = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>';
+        const exitIcon  = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4"/><path d="M15 4v5h5"/><path d="M9 20v-5H4"/><path d="M15 20v-5h5"/></svg>';
+        const Fullscreen = L.Control.extend({
+            options: { position: 'topleft' },
+            onAdd() {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                const link = L.DomUtil.create('a', 'leaflet-control-fullscreen', container);
+                link.href = '#';
+                link.title = 'Toggle fullscreen';
+                link.setAttribute('role', 'button');
+                link.setAttribute('aria-label', 'Toggle fullscreen');
+                link.innerHTML = enterIcon;
+                const wrapper = self.map.getContainer().closest('[data-component="mapFullscreenArea"]');
+                const toggle = () => {
+                    if (!wrapper) return;
+                    const active = wrapper.classList.toggle('is-fullscreen');
+                    document.body.classList.toggle('overflow-hidden', active);
+                    link.innerHTML = active ? exitIcon : enterIcon;
+                    setTimeout(() => {
+                        self.map.invalidateSize();
+                        if (self.routeBounds) self.map.fitBounds(self.routeBounds);
+                    }, 50);
+                };
+                const onKey = (e) => {
+                    if (e.key === 'Escape' && wrapper?.classList.contains('is-fullscreen')) {
+                        toggle();
+                    }
+                };
+                document.addEventListener('keydown', onKey);
+                L.DomEvent.on(link, 'click', L.DomEvent.stop)
+                          .on(link, 'click', toggle);
+                return container;
+            }
+        });
+        this.map.addControl(new Fullscreen());
+    }
+
     renderWindOverlay(wDir, wSpeed, speed) {
         this.windOverlayGroup = L.layerGroup().addTo(this.map);
         this.cachedWindDir = wDir;
@@ -148,6 +187,7 @@ export class LeafletMap {
         const latlngs = points.map(p => [p.lat, p.lon]);
         this.renderStartEnd(latlngs);
         this.addRecenterControl();
+        this.addFullscreenControl();
         this.renderWindOverlay(wDir, wSpeed, speed);
         this.renderWeatherOverlay(analysis.weatherMarkers);
     }

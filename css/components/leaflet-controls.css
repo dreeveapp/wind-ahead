@@ -24,3 +24,18 @@
 .leaflet-control-recenter {
     @apply flex! items-center justify-center;
 }
+.leaflet-control-fullscreen {
+    @apply flex! items-center justify-center;
+}
+#map:fullscreen {
+    @apply h-screen w-screen rounded-none border-none;
+}
+[data-component="mapFullscreenArea"].is-fullscreen {
+    @apply fixed inset-0 z-[9999] flex flex-col bg-white p-2 gap-2;
+}
+[data-component="mapFullscreenArea"].is-fullscreen > .relative:not([data-component]) {
+    @apply flex-1 min-h-0;
+}
+[data-component="mapFullscreenArea"].is-fullscreen #map {
+    @apply h-full w-full rounded-md;
+}
