@@ -1,5 +1,6 @@
 .wind-arrow-marker,
-.weather-pill-marker {
+.weather-pill-marker,
+.direction-arrow-marker {
     @apply bg-none! border-none!;
 }
 .weather-pill-marker span {

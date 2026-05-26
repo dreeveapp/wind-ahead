@@ -10,6 +10,7 @@ export class LeafletMap {
         this.layerGroup = null;
         this.windOverlayGroup = null;
         this.weatherOverlayGroup = null;
+        this.directionOverlayGroup = null;
         this.cachedWindDir = 0;
         this.hoverMarker = null;
         this.routeBounds = null;
@@ -69,6 +70,38 @@ export class LeafletMap {
             );
             this.layerGroup.addLayer(line);
         });
+    }
+
+    createDirectionArrowIcon(bearing) {
+        return L.divIcon({
+            className: 'direction-arrow-marker',
+            html: `<svg viewBox="0 0 24 24" width="22" height="22" style="transform:rotate(${bearing}deg)"><path d="M12 3 L19 18 L12 14.5 L5 18 Z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/></svg>`,
+            iconSize: [22, 22], iconAnchor: [11, 11]
+        });
+    }
+
+    renderDirectionArrows(segments, totalDist) {
+        this.directionOverlayGroup = L.layerGroup().addTo(this.map);
+        if (segments?.length && totalDist) {
+            const targetCount = 12;
+            const spacing = Math.max(totalDist / targetCount, 1000);
+            let cum = 0;
+            let nextMark = spacing / 2;
+            for (const seg of segments) {
+                cum += seg.dist;
+                if (cum >= nextMark) {
+                    const lat = (seg.p1.lat + seg.p2.lat) / 2;
+                    const lon = (seg.p1.lon + seg.p2.lon) / 2;
+                    L.marker([lat, lon], {
+                        icon: this.createDirectionArrowIcon(seg.brng),
+                        interactive: false,
+                        keyboard: false,
+                    }).addTo(this.directionOverlayGroup);
+                    nextMark += spacing;
+                }
+            }
+        }
+        this.addOverlayToggle(this.directionOverlayGroup, 'Direction', 'Route heading');
     }
 
     renderStartEnd(latlngs) {
@@ -145,6 +178,7 @@ export class LeafletMap {
         this.layerGroup = L.layerGroup().addTo(this.map);
 
         this.renderRoute(analysis.segments);
+        this.renderDirectionArrows(analysis.segments, analysis.totalDist);
         const latlngs = points.map(p => [p.lat, p.lon]);
         this.renderStartEnd(latlngs);
         this.addRecenterControl();
