@@ -36,4 +36,4 @@ Then open [http://127.0.0.1:3000](http://127.0.0.1:3000). Override the port with
 
 ## Related
 
-[Statistics for Strava](https://demo.getsfs.app) - A self-hosted dashboard for your Strava data
+[Dreeve](https://demo.dreeve.app) - A self-hosted, open-source dashboard for your sports and fitness data
