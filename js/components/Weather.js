@@ -22,7 +22,7 @@ export class Weather {
 
     render(state) {
         const { weather, windDir, dateTime, unitSystem } = state;
-        const speed = windSpeedLabel(state);
+        const speed = windSpeedLabel(state.windSpeedUnit, state.unitSystem);
         const date = new LocalDate(dateTime);
         const opts = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         this.title.textContent = `Weather - ${date.toLocaleDateString(undefined, opts)}`;

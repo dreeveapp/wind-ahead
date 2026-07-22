@@ -54,7 +54,7 @@ export class HourlyForecastTable {
         }
         this.section.classList.remove('hidden');
         const { unitSystem } = state;
-        const speedU = windSpeedLabel(state);
+        const speedU = windSpeedLabel(state.windSpeedUnit, state.unitSystem);
         const precipU = unitLabel(unitSystem, 'precip');
         this.body.innerHTML = rows.map((row) => {
             const timeStr = new LocalDate(row.time).toLocaleDateString(undefined, {

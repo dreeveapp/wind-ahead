@@ -1,7 +1,7 @@
 import { $, state, setView, setLoading, setError } from './state';
 import { assertUniqueDataComponents } from './utils/assertUniqueDataComponents';
 import { LocalDate } from './utils/LocalDate';
-import { unitLabel, windSpeedApiUnit, METRIC, IMPERIAL, WIND_SPEED_AUTO, WIND_SPEED_MS } from './utils/units';
+import { unitLabel, METRIC, IMPERIAL, WIND_SPEED_AUTO, WIND_SPEED_MS } from './utils/units';
 import { SPEED_KEY, UNITS_KEY, WIND_SPEED_UNIT_KEY, THEME_KEY, WEATHER_MODEL_KEY, WEATHER_MODELS } from './constants';
 import { GpxParser } from './services/GpxParser';
 import { OpenMeteo } from './services/OpenMeteo';
@@ -124,7 +124,15 @@ async function runAnalysis() {
         if (state._weatherCache && state._weatherCache.key === cacheKey) {
             data = state._weatherCache.data;
         } else {
-            data = await openMeteo.fetch(lat, lon, localDate, state.unitSystem, state.weatherModel, windSpeedApiUnit(state));
+            let windSpeedApiUnit;
+            if (state.windSpeedUnit === WIND_SPEED_MS) {
+                windSpeedApiUnit = 'ms';
+            } else if (state.unitSystem === IMPERIAL) {
+                windSpeedApiUnit = 'mph';
+            } else {
+                windSpeedApiUnit = 'kmh';
+            }
+            data = await openMeteo.fetch(lat, lon, localDate, state.unitSystem, state.weatherModel, windSpeedApiUnit);
             state._weatherCache = { key: cacheKey, data };
         }
         const weather = openMeteo.extract(data, localDate);

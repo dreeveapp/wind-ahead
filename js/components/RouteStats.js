@@ -1,5 +1,5 @@
 import { $ } from '../state';
-import { unitLabel, convertUnit, windSpeedLabel, windSpeedToKmh } from '../utils/units';
+import { unitLabel, convertUnit, windSpeedLabel, WIND_SPEED_MS, IMPERIAL } from '../utils/units';
 import { UV_BANDS, NO_WIND_THRESHOLD } from '../constants';
 import { GeoUtils } from '../utils/GeoUtils';
 import { Popover } from './Popover';
@@ -48,7 +48,7 @@ export class RouteStats {
             this.elevUnit.textContent = unitLabel(unitSystem, 'elev');
         }
 
-        const windUnit = windSpeedLabel(state);
+        const windUnit = windSpeedLabel(state.windSpeedUnit, state.unitSystem);
 
         const ah = analysis.avgHead;
         this.statNetValue.className = STAT_VALUE_CLASS;
@@ -87,7 +87,12 @@ export class RouteStats {
     }
 
     renderBeaufort(windSpeed, state) {
-        const kmh = windSpeedToKmh(windSpeed, state);
+        let kmh = windSpeed;
+        if (state.windSpeedUnit === WIND_SPEED_MS) {
+            kmh = windSpeed * 3.6;
+        } else if (state.unitSystem === IMPERIAL) {
+            kmh = windSpeed * 1.609344;
+        }
         const b = GeoUtils.beaufort(kmh);
         const [r, g, bl] = b.color;
         this.beaufortChip.textContent = `Force ${b.force} - ${b.name}`;
