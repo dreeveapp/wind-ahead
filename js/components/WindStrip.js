@@ -38,7 +38,7 @@ export class WindStrip {
             const { unitSystem } = state;
             const dist = convertUnit(seg.cumDist / 1000, 'dist', unitSystem).toFixed(1);
             const distU = unitLabel(unitSystem, 'dist');
-            const speedU = windSpeedLabel(state);
+            const speedU = windSpeedLabel(state.windSpeedUnit, state.unitSystem);
             const typeClass = seg.type === WindType.HEADWIND ? 'text-red-600' : seg.type === WindType.TAILWIND ? 'text-green-600'
                 : seg.type === WindType.CALM ? 'text-gray-500' : 'text-amber-600';
             const typeLabel = windTypeShortLabel(seg.type);

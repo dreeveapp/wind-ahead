@@ -175,7 +175,7 @@ export class LeafletMap {
 
     render(state) {
         const { points, analysis, windDir: wDir, windSpeed: wSpeed } = state;
-        const speed = windSpeedLabel(state);
+        const speed = windSpeedLabel(state.windSpeedUnit, state.unitSystem);
         if (this.map) { this.map.remove(); this.map = null; }
         this.map = L.map('map');
         this.tileLayer = L.tileLayer(appState.isDarkMode ? TILE_DARK : TILE_LIGHT, {

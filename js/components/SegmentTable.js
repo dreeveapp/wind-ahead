@@ -14,7 +14,7 @@ export class SegmentTable {
     render(state) {
         const { unitSystem } = state;
         const rows = this.compute(state.analysis.segments, NO_WIND_THRESHOLD);
-        const speed = windSpeedLabel(state);
+        const speed = windSpeedLabel(state.windSpeedUnit, state.unitSystem);
         const elev = unitLabel(unitSystem, 'elev');
         if (!rows.length) {
             this.container.classList.add('hidden');
