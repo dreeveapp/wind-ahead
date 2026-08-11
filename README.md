@@ -24,15 +24,31 @@ Track points, route points, waypoints, and elevation data are all supported.
 
 ## Run it locally
 
-Requires [Node.js](https://nodejs.org/) (no other dependencies needed to serve).
+### With Docker
 
-```bash
-git clone https://github.com/robiningelbrecht/wind-ahead.git
-cd wind-ahead
-npm start
+Create a `docker-compose.yml`:
+
+```yaml
+services:
+  windahead:
+    image: ghcr.io/robiningelbrecht/wind-ahead
+    container_name: windahead
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
 ```
 
-Then open [http://127.0.0.1:3000](http://127.0.0.1:3000). Override the port with `PORT=8080 npm start`.
+Then start it:
+
+```bash
+docker compose up -d
+```
+
+And open [http://localhost:8080](http://localhost:8080). Or without Compose:
+
+```bash
+docker run -d -p 8080:8080 --name windahead ghcr.io/robiningelbrecht/wind-ahead
+```
 
 ## Related
 

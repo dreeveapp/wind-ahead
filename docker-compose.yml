@@ -1,0 +1,10 @@
+services:
+  windahead:
+    build:
+      context: .
+      target: runtime
+    image: ghcr.io/robiningelbrecht/wind-ahead
+    container_name: windahead
+    restart: unless-stopped
+    ports:
+      - '8085:8080'

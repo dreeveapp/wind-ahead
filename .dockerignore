@@ -1,0 +1,17 @@
+.git
+.github
+.idea
+.DS_Store
+node_modules
+css
+js
+scripts
+assets/showcase.png
+CNAME
+Makefile
+README.md
+LICENSE
+package.json
+package-lock.json
+webpack.config.js
+docker-compose.yml

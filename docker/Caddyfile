@@ -1,0 +1,26 @@
+{
+	http_port 8080
+	auto_https off
+
+	log {
+		output stdout
+		format console
+		level {$CADDY_LOG_LEVEL:ERROR}
+	}
+}
+
+:8080 {
+	root * /srv
+	encode zstd gzip
+
+	@index path / /index.html
+
+	header /dist/* Cache-Control "public, max-age=31536000, immutable"
+	header /assets/* Cache-Control "public, max-age=604800"
+	header @index Cache-Control "no-cache"
+	header /assets/*.gpx Content-Type "application/gpx+xml"
+
+	header ?Permissions-Policy "browsing-topics=()"
+
+	file_server
+}
