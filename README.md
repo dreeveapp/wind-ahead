@@ -31,7 +31,7 @@ Create a `docker-compose.yml`:
 ```yaml
 services:
   windahead:
-    image: ghcr.io/robiningelbrecht/wind-ahead:latest
+    image: ghcr.io/dreeveapp/wind-ahead:latest
     container_name: windahead
     restart: unless-stopped
     ports:
