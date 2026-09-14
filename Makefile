@@ -7,7 +7,7 @@ build-containers:
 	@make dc cmd="build"
 
 up:
-	@make dc cmd="up -d"
+	@make dc cmd="up -d --build"
 
 logs:
 	@make dc cmd="logs -f windahead"

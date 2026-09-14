@@ -49,8 +49,8 @@ export const UV_BANDS = [
     { max: Infinity, label: 'Extreme',   color: 'text-red-600',   severity: 'danger',  advice: 'Maximum protection required. Consider rescheduling, or ride early or late.' },
 ];
 
-export const TILE_DARK = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-export const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+export const TILE_DARK = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_3k3u_1_e44f80e930a84c3b8ebcc732';
+export const TILE_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_3k3u_1_e44f80e930a84c3b8ebcc732';
 
 export const WEATHER_PARAMS = [
     'temperature_2m', 'relative_humidity_2m', 'apparent_temperature',
