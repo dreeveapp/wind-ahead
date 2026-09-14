@@ -35,11 +35,12 @@ export class Debug {
         });
     }
 
-    logUpload(file, parsed) {
+    logUpload(source, parsed) {
         const hasElevation = parsed.points.some(p => p.ele !== null);
-        this.log('GPX Upload', {
-            'File name': file.name,
-            'File size': (file.size / 1024).toFixed(1) + ' KB',
+        this.log('Route Upload', {
+            'Name': source.name,
+            'Type': source.type,
+            'Size': (source.size / 1024).toFixed(1) + ' KB',
             'Route name': parsed.name || '(none)',
             'Track points': parsed.points.length,
             'Has elevation': hasElevation,

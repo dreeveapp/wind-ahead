@@ -4,6 +4,7 @@ import { LocalDate } from './utils/LocalDate';
 import { unitLabel, METRIC, IMPERIAL, WIND_SPEED_AUTO, WIND_SPEED_MS } from './utils/units';
 import { SPEED_KEY, UNITS_KEY, WIND_SPEED_UNIT_KEY, THEME_KEY, WEATHER_MODEL_KEY, WEATHER_MODELS } from './constants';
 import { GpxParser } from './services/GpxParser';
+import { PolylineDecoder } from './services/PolylineDecoder';
 import { OpenMeteo } from './services/OpenMeteo';
 import { RouteAnalyzer } from './services/RouteAnalyzer';
 import { keyValueRepository } from './services/KeyValueRepository';
@@ -23,6 +24,7 @@ import { Debug } from './utils/Debug';
 const debug = new Debug(state);
 window.WindAhead = { debug: () => debug.snapshot() };
 const gpxParser = new GpxParser();
+const polylineDecoder = new PolylineDecoder();
 const openMeteo = new OpenMeteo();
 const routeAnalyzer = new RouteAnalyzer();
 const map = new LeafletMap();
@@ -69,14 +71,24 @@ function renderResults() {
     windStrip.render(state);
 }
 
-async function processGpx(name, text, { persist = true } = {}) {
+function parseRoute(name, { type, data }) {
+    if (type === 'polyline') {
+        const points = polylineDecoder.decode(data);
+        if (points.length < 2) throw new Error('Route needs at least 2 points');
+        return { points, name };
+    }
+
+    return gpxParser.parse(data);
+}
+
+async function loadRoute(name, route, { persist = true } = {}) {
     setView('results');
     setLoading(true);
     setError(null);
 
     try {
-        const parsed = gpxParser.parse(text);
-        debug.logUpload({ name, size: text.length }, parsed);
+        const parsed = parseRoute(name, route);
+        debug.logUpload({ name, type: route.type, size: route.data.length }, parsed);
         state.points = parsed.points;
         state.reversedPoints = [...parsed.points].reverse();
         state.routeName = parsed.name;
@@ -92,12 +104,12 @@ async function processGpx(name, text, { persist = true } = {}) {
         state.dateMax = nowDate.addDays(7).toString();
 
         if (persist) {
-            keyValueRepository.set('lastGpx', { name, text });
+            keyValueRepository.set('lastRoute', { name, route });
         }
 
         await runAnalysis();
     } catch (err) {
-        debug.logError('GPX processing', err);
+        debug.logError('Route processing', err);
         setLoading(false);
         setView('upload');
         setError(err.message || 'Something went wrong');
@@ -106,7 +118,24 @@ async function processGpx(name, text, { persist = true } = {}) {
 
 async function processFile(file) {
     const text = await file.text();
-    await processGpx(file.name, text);
+    await loadRoute(file.name, { type: 'gpx', data: text });
+}
+
+async function processHash() {
+    const params = new URLSearchParams(location.hash.slice(1));
+    const polyline = params.get('polyline');
+    if (!polyline) {
+        return false;
+    }
+
+    history.replaceState(null, '', location.pathname + location.search);
+    if (state.points) {
+        reset();
+    }
+
+    await loadRoute(params.get('name') || 'Route', { type: 'polyline', data: polyline });
+
+    return true;
 }
 
 async function runAnalysis() {
@@ -190,7 +219,7 @@ function reset() {
     segmentTable.hide();
     hourlyForecastTable.hide();
     map.destroy();
-    keyValueRepository.delete('lastGpx');
+    keyValueRepository.delete('lastRoute');
     setView('upload');
     setError(null);
 }
@@ -273,7 +302,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const dropZone = new DropZone();
-    dropZone.bind(processFile, processGpx);
+    dropZone.bind(processFile, loadRoute);
 
     $('dateInput').addEventListener('change', (e) => {
         state.dateTime = e.target.value;
@@ -300,8 +329,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     hourlyForecastTable = new HourlyForecastTable();
     windStrip.bind(map);
 
-    const cachedGpx = await keyValueRepository.get('lastGpx');
-    if (cachedGpx) {
-        dropZone.showLastGpx(cachedGpx.name, cachedGpx.text, processGpx);
+    window.addEventListener('hashchange', processHash);
+
+    if (await processHash()) {
+        return;
+    }
+
+    const cachedRoute = await keyValueRepository.get('lastRoute');
+    if (cachedRoute) {
+        dropZone.showLastRoute(cachedRoute.name, cachedRoute.route, loadRoute);
     }
 });

@@ -1,7 +1,7 @@
 import { $, setError } from '../state';
 
 export class DropZone {
-    bind(onFile, onGpx) {
+    bind(onFile, onRoute) {
         const zone = $('uploadView');
 
         zone.addEventListener('dragover', (e) => {
@@ -42,17 +42,17 @@ export class DropZone {
             const res = await fetch('./assets/tour-of-flanders.gpx');
             const blob = await res.blob();
             const text = await blob.text();
-            onGpx('tour-of-flanders.gpx', text, { persist: false });
+            onRoute('tour-of-flanders.gpx', { type: 'gpx', data: text }, { persist: false });
         });
     }
 
-    showLastGpx(name, text, onGpx) {
+    showLastRoute(name, route, onRoute) {
         const btn = $('lastGpxLink');
         $('lastGpxName').textContent = name;
         $('lastGpxContainer').classList.remove('hidden');
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            onGpx(name, text);
+            onRoute(name, route);
         });
     }
 }
